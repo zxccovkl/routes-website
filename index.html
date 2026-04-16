@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ROUTES — Redesigning Optimal Urban Transportation for Equitable School Access</title>
+    <meta name="description" content="A capstone project at NYU CUSP optimizing special education school bus routes for equity and efficiency in New York City.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --nyu-violet: #57068c;
+            --deep-violet: #330662;
+            --tandon-teal: #00A99D;
+            --text-dark: #1a1a2e;
+            --text-medium: #4a4a5a;
+            --text-light: #6b6b7b;
+            --bg-white: #ffffff;
+            --bg-light: #f8f7fc;
+            --bg-subtle: #f0eef7;
+            --border-light: #e8e6f0;
+            --shadow-soft: 0 4px 24px rgba(87, 6, 140, 0.08);
+            --shadow-medium: 0 8px 40px rgba(87, 6, 140, 0.12);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-dark);
+            line-height: 1.6;
+            background: var(--bg-white);
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4 {
+            font-weight: 600;
+            line-height: 1.2;
+        }
+
+        h1 { font-size: clamp(2.5rem, 5vw, 4rem); letter-spacing: -0.02em; }
+        h2 { font-size: clamp(1.8rem, 3vw, 2.5rem); letter-spacing: -0.01em; }
+        h3 { font-size: clamp(1.2rem, 2vw, 1.5rem); }
+        
+        .section-label {
+            font-size: 0.75rem;
+            font-weight: 600;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--nyu-violet);
+            margin-bottom: 1rem;
+        }
+
+        /* Navigation */
+        nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border-light);
+            z-index: 1000;
+            padding: 0 2rem;
+        }
+
+        .nav-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 72px;
+        }
+
+        .nav-logo {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: var(--nyu-violet);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-logo svg {
+            width: 28px;
+            height: 28px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2.5rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-medium);
+            text-decoration: none;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: var(--nyu-violet);
+        }
+
+        .nav-mobile-toggle {
+            display: none;
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            padding: 6rem 2rem 4rem;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+
+        .hero-bg img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            filter: brightness(0.4);
+        }
+
+        .hero-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(51, 6, 98, 0.85) 0%, rgba(87, 6, 140, 0.7) 100%);
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 1;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+            color: white;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(10px);
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .hero-badge svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .hero h1 {
+            max-width: 900px;
+            margin-bottom: 1.5rem;
+            font-weight: 700;
+        }
+
+        .hero-subtitle {
+            font-size: clamp(1.1rem, 2vw, 1.4rem);
+            opacity: 0.9;
+            max-width: 700px;
+            margin-bottom: 2.5rem;
+            line-height: 1.7;
+        }
+
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            max-width: 800px;
+        }
+
+        .hero-stat {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 16px;
+            padding: 1.5rem;
+        }
+
+        .hero-stat-number {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: white;
+            line-height: 1;
+            margin-bottom: 0.5rem;
+        }
+
+        .hero-stat-label {
+            font-size: 0.85rem;
+            opacity: 0.8;
+        }
+
+        /* Sections */
+        section {
+            padding: 6rem 2rem;
+        }
+
+        .section-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .bg-light {
+            background: var(--bg-light);
+        }
+
+        /* Overview */
+        .overview-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            margin-top: 3rem;
+        }
+
+        .overview-text h3 {
+            color: var(--nyu-violet);
+            margin-bottom: 1rem;
+        }
+
+        .overview-text p {
+            color: var(--text-medium);
+            margin-bottom: 1.5rem;
+            font-size: 1.05rem;
+        }
+
+        .overview-image {
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-medium);
+        }
+
+        .overview-image img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        /* Research Question */
+        .research-question {
+            background: var(--deep-violet);
+            color: white;
+            text-align: center;
+        }
+
+        .research-question h2 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .research-question p {
+            font-family: 'Source Serif 4', Georgia, serif;
+            font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+            max-width: 900px;
+            margin: 0 auto;
+            opacity: 0.95;
+            line-height: 1.8;
+        }
+
+        /* Why This Matters */
+        .why-matters {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .why-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .why-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .why-icon {
+            width: 56px;
+            height: 56px;
+            background: var(--bg-subtle);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .why-icon svg {
+            width: 28px;
+            height: 28px;
+            color: var(--nyu-violet);
+        }
+
+        .why-card h4 {
+            font-size: 1.1rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .why-card p {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+        }
+
+        /* Methodology */
+        .methodology-steps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .method-step {
+            text-align: center;
+            padding: 2rem 1rem;
+            position: relative;
+        }
+
+        .method-step:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 40px;
+            right: -0.75rem;
+            width: 1.5rem;
+            height: 2px;
+            background: var(--tandon-teal);
+        }
+
+        .method-number {
+            width: 56px;
+            height: 56px;
+            background: linear-gradient(135deg, var(--nyu-violet), var(--deep-violet));
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin: 0 auto 1.5rem;
+        }
+
+        .method-step h4 {
+            margin-bottom: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .method-step p {
+            color: var(--text-medium);
+            font-size: 0.9rem;
+        }
+
+        .data-sources {
+            margin-top: 4rem;
+            background: var(--bg-subtle);
+            border-radius: 20px;
+            padding: 2.5rem;
+        }
+
+        .data-sources h3 {
+            margin-bottom: 1.5rem;
+        }
+
+        .source-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+        }
+
+        .source-tag {
+            background: white;
+            padding: 0.5rem 1rem;
+            border-radius: 100px;
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            border: 1px solid var(--border-light);
+        }
+
+        /* Key Findings */
+        .findings-header {
+            text-align: center;
+            max-width: 800px;
+            margin: 0 auto 3rem;
+        }
+
+        .findings-header p {
+            color: var(--text-medium);
+            margin-top: 1rem;
+        }
+
+        .route-comparison {
+            margin-bottom: 4rem;
+        }
+
+        .route-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .route-badge {
+            background: var(--nyu-violet);
+            color: white;
+            padding: 0.4rem 1rem;
+            border-radius: 100px;
+            font-weight: 600;
+            font-size: 0.9rem;
+        }
+
+        .route-badge.teal {
+            background: var(--tandon-teal);
+        }
+
+        .route-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+        }
+
+        .route-school {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+        }
+
+        .route-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .route-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: var(--shadow-soft);
+            border: 1px solid var(--border-light);
+        }
+
+        .route-card-header {
+            background: var(--bg-light);
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--border-light);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .route-card-body {
+            padding: 1.5rem;
+        }
+
+        .route-card-body img {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .route-card-caption {
+            font-size: 0.85rem;
+            color: var(--text-medium);
+            line-height: 1.5;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .metric {
+            background: var(--bg-light);
+            padding: 1rem;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--nyu-violet);
+        }
+
+        .metric-value.improved {
+            color: var(--tandon-teal);
+        }
+
+        .metric-change {
+            font-size: 0.8rem;
+            color: var(--tandon-teal);
+            margin-top: 0.25rem;
+        }
+
+        .metric-label {
+            font-size: 0.8rem;
+            color: var(--text-light);
+            margin-top: 0.25rem;
+        }
+
+        .intervention-note {
+            background: var(--bg-subtle);
+            border-left: 3px solid var(--tandon-teal);
+            padding: 1.25rem 1.5rem;
+            border-radius: 0 12px 12px 0;
+            margin-top: 1.5rem;
+        }
+
+        .intervention-note h4 {
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--nyu-violet);
+            margin-bottom: 0.5rem;
+        }
+
+        .intervention-note p {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+        }
+
+        /* Recommendations */
+        .recommendations-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+        }
+
+        .rec-card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+            box-shadow: var(--shadow-soft);
+        }
+
+        .rec-card-header {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .rec-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--nyu-violet), var(--deep-violet));
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .rec-icon svg {
+            width: 24px;
+            height: 24px;
+            color: white;
+        }
+
+        .rec-card h4 {
+            font-size: 1.1rem;
+        }
+
+        .rec-card p {
+            color: var(--text-medium);
+            font-size: 0.95rem;
+            line-height: 1.7;
+        }
+
+        /* Deliverables */
+        .deliverables-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-top: 3rem;
+        }
+
+        .deliverable {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            text-align: center;
+            border: 1px solid var(--border-light);
+            transition: transform 0.2s;
+        }
+
+        .deliverable:hover {
+            transform: translateY(-2px);
+        }
+
+        .deliverable-icon {
+            width: 64px;
+            height: 64px;
+            background: var(--bg-subtle);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1rem;
+        }
+
+        .deliverable-icon svg {
+            width: 32px;
+            height: 32px;
+            color: var(--nyu-violet);
+        }
+
+        .deliverable h4 {
+            font-size: 0.95rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .deliverable p {
+            color: var(--text-medium);
+            font-size: 0.85rem;
+        }
+
+        /* Team */
+        .team-section {
+            text-align: center;
+        }
+
+        .team-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+            margin-top: 3rem;
+            max-width: 900px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .team-card {
+            background: white;
+            border-radius: 16px;
+            padding: 2rem;
+            border: 1px solid var(--border-light);
+        }
+
+        .team-avatar {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, var(--nyu-violet), var(--deep-violet));
+            border-radius: 50%;
+            margin: 0 auto 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.8rem;
+            font-weight: 600;
+        }
+
+        .team-card h4 {
+            margin-bottom: 0.25rem;
+        }
+
+        .team-role {
+            color: var(--nyu-violet);
+            font-size: 0.85rem;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+        }
+
+        .team-org {
+            color: var(--text-light);
+            font-size: 0.85rem;
+        }
+
+        /* Footer */
+        footer {
+            background: var(--deep-violet);
+            color: white;
+            padding: 4rem 2rem;
+            text-align: center;
+        }
+
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+        }
+
+        .footer-tagline {
+            opacity: 0.7;
+            max-width: 500px;
+            margin: 0 auto 2rem;
+        }
+
+        .footer-links {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .footer-links a {
+            color: white;
+            text-decoration: none;
+            opacity: 0.7;
+            transition: opacity 0.2s;
+        }
+
+        .footer-links a:hover {
+            opacity: 1;
+        }
+
+        .footer-credit {
+            font-size: 0.85rem;
+            opacity: 0.6;
+        }
+
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-on-scroll {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .animate-on-scroll.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .overview-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .methodology-steps {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .method-step:nth-child(2)::after,
+            .method-step:nth-child(4)::after {
+                display: none;
+            }
+            
+            .deliverables-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .nav-mobile-toggle {
+                display: block;
+            }
+            
+            .hero-stats {
+                grid-template-columns: 1fr;
+            }
+            
+            .why-matters {
+                grid-template-columns: 1fr;
+            }
+            
+            .route-cards {
+                grid-template-columns: 1fr;
+            }
+            
+            .recommendations-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .team-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .methodology-steps {
+                grid-template-columns: 1fr;
+            }
+            
+            .method-step::after {
+                display: none !important;
+            }
+            
+            .deliverables-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav>
+        <div class="nav-inner">
+            <a href="#" class="nav-logo">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M3 17l6-6 4 4 8-8"/>
+                    <circle cx="17" cy="7" r="3"/>
+                </svg>
+                ROUTES
+            </a>
+            <ul class="nav-links">
+                <li><a href="#overview">Overview</a></li>
+                <li><a href="#methodology">Methodology</a></li>
+                <li><a href="#findings">Findings</a></li>
+                <li><a href="#recommendations">Recommendations</a></li>
+                <li><a href="#team">Team</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg">
+            <img src="imgs/hero_bus.jpg" alt="School bus on NYC street">
+            <div class="hero-overlay"></div>
+        </div>
+        <div class="hero-content">
+            <div class="hero-badge">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                    <path d="M2 17l10 5 10-5"/>
+                    <path d="M2 12l10 5 10-5"/>
+                </svg>
+                NYU CUSP Capstone 2026
+            </div>
+            <h1>Redesigning Optimal Urban Transportation for Equitable School Access</h1>
+            <p class="hero-subtitle">Optimizing special education school bus routes in New York City to reduce student burden while preserving equitable access for vulnerable populations.</p>
+            <div class="hero-stats">
+                <div class="hero-stat">
+                    <div class="hero-stat-number">2</div>
+                    <div class="hero-stat-label">Routes Analyzed</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">10</div>
+                    <div class="hero-stat-label">Students Served</div>
+                </div>
+                <div class="hero-stat">
+                    <div class="hero-stat-number">21%</div>
+                    <div class="hero-stat-label">Avg. Burden Reduction</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Overview -->
+    <section id="overview" class="bg-light">
+        <div class="section-inner">
+            <p class="section-label">Project Overview</p>
+            <div class="overview-grid">
+                <div class="overview-text">
+                    <h2>Equitable Transportation for Special Education Students</h2>
+                    <h3>The Challenge</h3>
+                    <p>Special education students in New York City rely heavily on school bus transportation to access essential educational services. Unlike general education transportation, these students often cannot independently navigate public transit, making reliable bus service critical.</p>
+                    <h3>Our Approach</h3>
+                    <p>ROUTES applies geospatial analysis and data-driven optimization to identify route inefficiencies that contribute to excessive ride times. Our methodology balances operational efficiency with equity considerations, ensuring that optimization never compromises student access to education.</p>
+                </div>
+                <div class="overview-image">
+                    <img src="imgs/diversity_scene.jpg" alt="Children at school bus stop">
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Question -->
+    <section class="research-question">
+        <div class="section-inner">
+            <p class="section-label" style="color: rgba(255,255,255,0.7);">Research Question</p>
+            <h2>How can we reduce excessive school bus ride times while preserving equitable access for special education students in NYC?</h2>
+        </div>
+    </section>
+
+    <!-- Why This Matters -->
+    <section>
+        <div class="section-inner">
+            <p class="section-label">Why This Matters</p>
+            <h2>Beyond Efficiency: The Equity Imperative</h2>
+            <div class="why-matters">
+                <div class="why-card">
+                    <div class="why-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"/>
+                            <path d="M12 6v6l4 2"/>
+                        </svg>
+                    </div>
+                    <h4>Extended Ride Times</h4>
+                    <p>Some students spend over 21 hours per week on school buses—time that could be spent on education, rest, or family. Our analysis targets routes with excessive pre-service slack and inefficient pickup sequences.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                            <circle cx="9" cy="7" r="4"/>
+                            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+                        </svg>
+                    </div>
+                    <h4>Vulnerable Populations</h4>
+                    <p>Special education students often come from households with limited transportation options. In our study areas, up to 79% of families lack personal vehicles, making school bus service their only viable option.</p>
+                </div>
+                <div class="why-card">
+                    <div class="why-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                        </svg>
+                    </div>
+                    <h4>Preserved Access</h4>
+                    <p>Optimization must protect student access. Our intervention framework requires that no required rider be removed from service, ensuring equity remains central to efficiency gains.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Methodology -->
+    <section id="methodology" class="bg-light">
+        <div class="section-inner">
+            <p class="section-label">Methodology</p>
+            <h2>A Reproducible Workflow for Route Optimization</h2>
+            <div class="methodology-steps">
+                <div class="method-step">
+                    <div class="method-number">1</div>
+                    <h4>Route Selection</h4>
+                    <p>Screen routes using burden metrics and feasibility scores to identify candidates with highest optimization potential.</p>
+                </div>
+                <div class="method-step">
+                    <div class="method-number">2</div>
+                    <h4>Baseline Analysis</h4>
+                    <p>Establish current route performance including pickup sequences, time windows, and equity context.</p>
+                </div>
+                <div class="method-step">
+                    <div class="method-number">3</div>
+                    <h4>Intervention Design</h4>
+                    <p>Develop targeted interventions that preserve coverage while compressing route span and timing.</p>
+                </div>
+                <div class="method-step">
+                    <div class="method-number">4</div>
+                    <h4>Scenario Comparison</h4>
+                    <p>Evaluate before/after scenarios to quantify burden reduction and validate feasibility constraints.</p>
+                </div>
+            </div>
+            <div class="data-sources">
+                <h3>Data Sources</h3>
+                <div class="source-tags">
+                    <span class="source-tag">NYCSBUS Operational Data</span>
+                    <span class="source-tag">NYC Open Data</span>
+                    <span class="source-tag">American Community Survey</span>
+                    <span class="source-tag">CDC Social Vulnerability Index</span>
+                    <span class="source-tag">MTA GTFS</span>
+                    <span class="source-tag">OpenStreetMap Network</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Key Findings -->
+    <section id="findings">
+        <div class="section-inner">
+            <div class="findings-header">
+                <p class="section-label">Key Visual Findings</p>
+                <h2>Route Optimization Results</h2>
+                <p>Two Brooklyn routes were selected for detailed before/after analysis, demonstrating measurable improvements in student burden while maintaining full service coverage.</p>
+            </div>
+
+            <!-- Route K612 -->
+            <div class="route-comparison">
+                <div class="route-header">
+                    <span class="route-badge teal">Route B</span>
+                    <div>
+                        <div class="route-title">K612 — WBK - MW</div>
+                        <div class="route-school">Shema Kolainu Hear Our Voices School for the Deaf</div>
+                    </div>
+                </div>
+                <div class="route-cards">
+                    <div class="route-card">
+                        <div class="route-card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            Before Optimization
+                        </div>
+                        <div class="route-card-body">
+                            <img src="imgs/route_K612_before_map.png" alt="Route K612 before optimization">
+                            <p class="route-card-caption">Original route with 8 pickup points spanning 1,305 minutes of total operational time. The extended run covers a large service area in southern Brooklyn.</p>
+                            <div class="metrics-grid">
+                                <div class="metric">
+                                    <div class="metric-value">195</div>
+                                    <div class="metric-label">AM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value">660</div>
+                                    <div class="metric-label">PM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value">1,305</div>
+                                    <div class="metric-label">Run Span (min)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="route-card">
+                        <div class="route-card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--tandon-teal)" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            After Optimization
+                        </div>
+                        <div class="route-card-body">
+                            <img src="imgs/route_K612_after_map.png" alt="Route K612 after optimization">
+                            <p class="route-card-caption">Post-intervention route showing reassigned outer segment (orange dashed line). The main route now operates with 7 pickup points, reducing operational span while preserving all required stops.</p>
+                            <div class="metrics-grid">
+                                <div class="metric">
+                                    <div class="metric-value improved">146</div>
+                                    <div class="metric-change">-25%</div>
+                                    <div class="metric-label">AM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value improved">561</div>
+                                    <div class="metric-change">-15%</div>
+                                    <div class="metric-label">PM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value improved">940</div>
+                                    <div class="metric-change">-28%</div>
+                                    <div class="metric-label">Run Span (min)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="intervention-note">
+                    <h4>Intervention Strategy</h4>
+                    <p><strong>Short Segment Reassignment + Time Window Shift:</strong> The longest low-efficiency outer segment was reassigned, with the AM pickup window tightened to reduce pre-start slack. Feasibility remains OK, and all 8 students retain service access in the lower-income study area.</p>
+                </div>
+            </div>
+
+            <!-- Route L657 -->
+            <div class="route-comparison">
+                <div class="route-header">
+                    <span class="route-badge">Route A</span>
+                    <div>
+                        <div class="route-title">L657 — BBK - MW</div>
+                        <div class="route-school">Fusion Academy Brooklyn</div>
+                    </div>
+                </div>
+                <div class="route-cards">
+                    <div class="route-card">
+                        <div class="route-card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                            Before Optimization
+                        </div>
+                        <div class="route-card-body">
+                            <img src="imgs/route_L657_before_map.png" alt="Route L657 before optimization">
+                            <p class="route-card-caption">Baseline route serving 2 students with 570 minutes of total run span. The route operates in an area with 79% no-vehicle households.</p>
+                            <div class="metrics-grid">
+                                <div class="metric">
+                                    <div class="metric-value">210</div>
+                                    <div class="metric-label">AM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value">0</div>
+                                    <div class="metric-label">PM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value">570</div>
+                                    <div class="metric-label">Run Span (min)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="route-card">
+                        <div class="route-card-header">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--tandon-teal)" stroke-width="2">
+                                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                                <polyline points="22 4 12 14.01 9 11.01"/>
+                            </svg>
+                            After Optimization
+                        </div>
+                        <div class="route-card-body">
+                            <img src="imgs/route_L657_after_map.png" alt="Route L657 after optimization">
+                            <p class="route-card-caption">Geometry unchanged; operational improvements achieved through timing optimization. Route geometry remains identical to preserve familiar service patterns.</p>
+                            <div class="metrics-grid">
+                                <div class="metric">
+                                    <div class="metric-value improved">147</div>
+                                    <div class="metric-change">-30%</div>
+                                    <div class="metric-label">AM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value">0</div>
+                                    <div class="metric-label">PM Burden (min)</div>
+                                </div>
+                                <div class="metric">
+                                    <div class="metric-value improved">456</div>
+                                    <div class="metric-change">-20%</div>
+                                    <div class="metric-label">Run Span (min)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="intervention-note">
+                    <h4>Intervention Strategy</h4>
+                    <p><strong>Minor Stop Merge + Tighter Pickup Window:</strong> Redundant AM pickup movements merged where rider protection is maintained. First pickup shifted later where feasible, reducing pre-service slack. All student access preserved in this high no-vehicle context area.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Recommendations -->
+    <section id="recommendations" class="bg-light">
+        <div class="section-inner">
+            <p class="section-label">Recommendations</p>
+            <h2>Operational Implications</h2>
+            <p style="color: var(--text-medium); max-width: 700px; margin-bottom: 2rem;">Based on our analysis, we offer practical recommendations for route optimization that balance efficiency gains with equity preservation.</p>
+            <div class="recommendations-grid">
+                <div class="rec-card">
+                    <div class="rec-card-header">
+                        <div class="rec-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                            </svg>
+                        </div>
+                        <h4>Route Segment Reassignment</h4>
+                    </div>
+                    <p>For longer routes with dispersed outer stops, consider bounded segment reassignment. Identify the longest low-efficiency pickup leg and evaluate whether it can be served via a separate connector or adjusted route structure while preserving rider access.</p>
+                </div>
+                <div class="rec-card">
+                    <div class="rec-card-header">
+                        <div class="rec-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"/>
+                                <polyline points="12 6 12 12 16 14"/>
+                            </svg>
+                        </div>
+                        <h4>Pickup Window Compression</h4>
+                    </div>
+                    <p>Tighten AM pickup schedules by reducing pre-start slack where pickup sequence allows. Shifting first pickups later and compressing windows can yield significant burden reductions without route restructuring.</p>
+                </div>
+                <div class="rec-card">
+                    <div class="rec-card-header">
+                        <div class="rec-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+                            </svg>
+                        </div>
+                        <h4>Equity-First Screening</h4>
+                    </div>
+                    <p>Apply equity vulnerability filters before optimization. Routes serving high no-vehicle populations or lower-income areas warrant special review to ensure optimization decisions do not inadvertently reduce service quality for the most dependent riders.</p>
+                </div>
+                <div class="rec-card">
+                    <div class="rec-card-header">
+                        <div class="rec-icon">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                <polyline points="14 2 14 8 20 8"/>
+                                <line x1="16" y1="13" x2="8" y2="13"/>
+                                <line x1="16" y1="17" x2="8" y2="17"/>
+                                <polyline points="10 9 9 9 8 9"/>
+                            </svg>
+                        </div>
+                        <h4>Documentation Standards</h4>
+                    </div>
+                    <p>Establish clear intervention documentation protocols. Each optimization should record the rationale, equity considerations, and projected outcomes to enable systematic evaluation and continuous improvement.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Deliverables -->
+    <section>
+        <div class="section-inner">
+            <p class="section-label">Deliverables</p>
+            <h2>Project Outputs</h2>
+            <div class="deliverables-grid">
+                <div class="deliverable">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                            <polyline points="14 2 14 8 20 8"/>
+                            <line x1="16" y1="13" x2="8" y2="13"/>
+                            <line x1="16" y1="17" x2="8" y2="17"/>
+                        </svg>
+                    </div>
+                    <h4>Analytical Report</h4>
+                    <p>Complete methodology and findings documentation</p>
+                </div>
+                <div class="deliverable">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/>
+                            <line x1="8" y1="2" x2="8" y2="18"/>
+                            <line x1="16" y1="6" x2="16" y2="22"/>
+                        </svg>
+                    </div>
+                    <h4>Route Comparisons</h4>
+                    <p>Before/after visual analysis for selected routes</p>
+                </div>
+                <div class="deliverable">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="18" y1="20" x2="18" y2="10"/>
+                            <line x1="12" y1="20" x2="12" y2="4"/>
+                            <line x1="6" y1="20" x2="6" y2="14"/>
+                        </svg>
+                    </div>
+                    <h4>Scenario Analysis</h4>
+                    <p>Intervention scenario comparison outputs</p>
+                </div>
+                <div class="deliverable">
+                    <div class="deliverable-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/>
+                            <path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/>
+                        </svg>
+                    </div>
+                    <h4>Recommendations</h4>
+                    <p>Operational guidance for implementation</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Team -->
+    <section id="team" class="team-section bg-light">
+        <div class="section-inner">
+            <p class="section-label">Team & Acknowledgments</p>
+            <h2>Project Team</h2>
+            
+            <h3 style="margin-top: 2rem; font-size: 1rem; color: var(--text-medium); text-transform: uppercase; letter-spacing: 0.1em;">Authors</h3>
+            <div class="team-grid" style="grid-template-columns: repeat(3, 1fr); margin-top: 1rem;">
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, var(--nyu-violet), var(--deep-violet));">JY</div>
+                    <h4>Jiehang Yu</h4>
+                    <div class="team-role">Student Researcher</div>
+                    <div class="team-org">NYU CUSP</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, var(--nyu-violet), var(--deep-violet));">JP</div>
+                    <h4>Jinyi Peng</h4>
+                    <div class="team-role">Student Researcher</div>
+                    <div class="team-org">NYU CUSP</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, var(--nyu-violet), var(--deep-violet));">TL</div>
+                    <h4>Tianyu Lang</h4>
+                    <div class="team-role">Student Researcher</div>
+                    <div class="team-org">NYU CUSP</div>
+                </div>
+            </div>
+            
+            <h3 style="margin-top: 2.5rem; font-size: 1rem; color: var(--text-medium); text-transform: uppercase; letter-spacing: 0.1em;">Sponsors & Mentors</h3>
+            <div class="team-grid" style="grid-template-columns: repeat(4, 1fr); margin-top: 1rem;">
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, var(--tandon-teal), #007a75);">GC</div>
+                    <h4>Giulia Ceccarelli</h4>
+                    <div class="team-role">Project Sponsor</div>
+                    <div class="team-org">Systematica US / Fondazione Transform Transport ETS / NYCSBUS</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, #555, #333);">FM</div>
+                    <h4>Federico Messa</h4>
+                    <div class="team-role">Mentor</div>
+                    <div class="team-org">Systematica US</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, #555, #333);">AG</div>
+                    <h4>Andrea Gorrini</h4>
+                    <div class="team-role">Mentor</div>
+                    <div class="team-org">Fondazione Transform Transport ETS</div>
+                </div>
+                <div class="team-card">
+                    <div class="team-avatar" style="background: linear-gradient(135deg, #555, #333);">VA</div>
+                    <h4>Varun Adibhatla</h4>
+                    <div class="team-role">Mentor</div>
+                    <div class="team-org">NYCSBUS</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <div class="footer-inner">
+            <div class="footer-logo">ROUTES</div>
+            <p class="footer-tagline">Redesigning Optimal Urban Transportation for Equitable School Access<br>A Capstone Project at NYU Center for Urban Science + Progress</p>
+            <div class="footer-links">
+                <a href="#overview">Overview</a>
+                <a href="#methodology">Methodology</a>
+                <a href="#findings">Findings</a>
+                <a href="#recommendations">Recommendations</a>
+            </div>
+            <p class="footer-credit">© 2026 ROUTES Project. NYU CUSP Capstone.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.why-card, .method-step, .route-card, .rec-card, .deliverable').forEach(el => {
+            el.classList.add('animate-on-scroll');
+            observer.observe(el);
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('.nav-links a').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = link.getAttribute('href');
+                document.querySelector(targetId).scrollIntoView({
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>
